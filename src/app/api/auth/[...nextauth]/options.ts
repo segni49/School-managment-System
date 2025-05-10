@@ -1,9 +1,21 @@
-import  type {NextAuthOptions} from 'next-auth'
+import  type {DefaultSession, NextAuthOptions, Session} from 'next-auth'
 import Github from 'next-auth/providers/github'
 import Credentials from 'next-auth/providers/credentials'
 import db from '@/lib/database/db'
 import bcrypt from 'bcryptjs'
+import { Role } from '@prisma/client'
+import { JWT } from 'next-auth/jwt'
 
+
+// Extend the Session type to include id and role
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      role: Role;
+    } & DefaultSession['user'];
+  }
+}
 
 export const options: NextAuthOptions = {
     providers: [
@@ -33,12 +45,31 @@ export const options: NextAuthOptions = {
            if(!passwordmatch) {
             throw new Error("incorrect password!")
            }
-           return user;
+           return { ...user, role: user.role }; // Ensure role is included in the returned user object
        },
           
        }),
     ],
     pages: {
         signIn: "/login"
+    },
+    callbacks: {
+  async jwt({ token, user }) {
+    if (user) {
+      token.id = user.id;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      token.role = (user as any).role; // Explicitly cast user to include role
     }
+    return token;
+  },
+
+  async session({ session, token }: { session: Session; token: JWT & { id?: string; role?: Role } }) {
+    if (token) {
+      session.user.id = token.id!;
+      session.user.role = token.role!;  // Include role in session with a default fallback
+    }
+    return session;
+  },
+},
+
 }

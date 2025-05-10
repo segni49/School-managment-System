@@ -1,16 +1,20 @@
 "use client";
+import React from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
      const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
       const handleLogin = async () => {
     const result = await signIn("credentials", { email, password, redirect: false });
     
-    if (!result?.error) {
-      window.location.href = "/dashboard"; // Redirect on success
+    if (result) {
+      window.location.href = "/dashboard";
+      router.push('/dashboard'); // Redirect on success
     } else {
       setError("Invalid email or password");
     }
@@ -58,6 +62,8 @@ export default function LoginPage() {
           >
             Sign In
           </button>
+                {error && <p className="mt-2 text-red-500 text-sm text-center">{error}</p>}
+      
            
         </form>
 
