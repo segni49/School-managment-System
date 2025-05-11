@@ -1,4 +1,4 @@
-import  type {DefaultSession, NextAuthOptions, Session} from 'next-auth'
+import  type { NextAuthOptions, Session} from 'next-auth'
 import Github from 'next-auth/providers/github'
 import Credentials from 'next-auth/providers/credentials'
 import db from '@/lib/database/db'
@@ -8,12 +8,21 @@ import { JWT } from 'next-auth/jwt'
 
 
 // Extend the Session type to include id and role
-declare module 'next-auth' {
+
+
+declare module "next-auth" {
+  interface User {
+    id: string;
+    role: Role;
+  }
+
   interface Session {
-    user: {
-      id: string;
-      role: Role;
-    } & DefaultSession['user'];
+    user: User;
+  }
+
+  interface JWT {
+    id?: string;
+    role?: Role;
   }
 }
 
@@ -57,8 +66,8 @@ export const options: NextAuthOptions = {
   async jwt({ token, user }) {
     if (user) {
       token.id = user.id;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      token.role = (user as any).role; // Explicitly cast user to include role
+     
+      token.role = user.role || "GUEST"; // Explicitly cast user to include role
     }
     return token;
   },

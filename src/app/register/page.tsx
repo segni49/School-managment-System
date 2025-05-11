@@ -16,7 +16,7 @@ export default function RegisterPage() {
     event.preventDefault();
 
     try {
-      const response = await axios.post("/api/register", { email, password });
+      const response = await axios.post("/api/postz/user/register", { email, password });
       if (response) {
              setSuccess("Registration successful! You can now log in.");
       setError("");

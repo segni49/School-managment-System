@@ -1,4 +1,5 @@
 "use client";
+
 import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
@@ -11,7 +12,7 @@ export default function Dashboard() {
       {session.user.role === "ADMIN" && <h1 className="text-2xl font-bold">Admin Dashboard</h1>}
       {session.user.role === "TEACHER" && <h1 className="text-2xl font-bold">Teacher Dashboard</h1>}
       {session.user.role === "STUDENT" && <h1 className="text-2xl font-bold">Student Dashboard</h1>}
-  
+    
     </div>
   );
 }
