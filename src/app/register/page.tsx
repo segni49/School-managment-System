@@ -3,32 +3,38 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // Default role
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true); // Show loading state
 
     try {
-      const response = await axios.post("/api/postz/user/register", { email, password });
-      if (response) {
-             setSuccess("Registration successful! You can now log in.");
-      setError("");
-      router.push('/login');
-      }
+      const response = await axios.post("/api/register", { email, password});
 
-   
-    } catch (err: unknown) {
-       if(err instanceof Error) {
-        setError( "Registration failed!");
-      setSuccess("");
-       }
+      console.log("API Response:", response.data); // Debugging log
+
+      if (response.status === 201) {
+        setSuccess("Registration successful! Redirecting to login...");
+        setError("");
+        setTimeout(() => router.push("/login"), 2000); // Redirect after success
+      } else {
+        setError(response.data.error || "Registration failed!");
+      }
+    } catch (err) {
+         if(err instanceof Error) {
+          console.error("Registration Error:", err); // Debugging
+      setError("Registration failed!");
+    } } finally {
+      setLoading(false);
     }
   };
 
@@ -65,13 +71,14 @@ export default function RegisterPage() {
             />
           </div>
 
-         
+      
 
           <button
             type="submit"
             className="mt-6 w-full bg-blue-500 text-white rounded-lg py-2 font-medium hover:bg-blue-600 transition-all"
+            disabled={loading} // Disable button while loading
           >
-            Sign Up
+            {loading ? "Registering..." : "Sign Up"}
           </button>
         </form>
 

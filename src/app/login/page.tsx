@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     setSuccess("Login successful! Redirecting...");
     setLoading(false);
-    router.push("/dashboard"); // Redirect on success
+    router.push(`/admin`); // Redirect on success
   };
 
   return (

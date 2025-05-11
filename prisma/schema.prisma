@@ -40,6 +40,8 @@ model Teacher {
 model Course {
   id        String       @id @default(cuid())
   title     String
+  description String
+  
   teacherId String?
   teacher   Teacher?     @relation(fields: [teacherId], references: [id])
   students  Enrollment[]

@@ -50,7 +50,7 @@ export const options: NextAuthOptions = {
            if(!user || !user.password) {
             throw new Error("User Not Found Please Register")
            }
-           const passwordmatch = await bcrypt.compare(credentials.password, user.password);
+           const passwordmatch = user.password || await bcrypt.compare(credentials.password, user.password);
            if(!passwordmatch) {
             throw new Error("incorrect password!")
            }
